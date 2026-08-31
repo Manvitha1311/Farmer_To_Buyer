@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Farmer Page - Sell Crops</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f9f4;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      color: #1565c0;
+      margin-bottom: 20px;
+    }
+    h2 {
+      margin-top: 40px;
+      color: #444;
+    }
+
+    /* Back button */
+    .back-btn {
+      background: #43a047;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      position: absolute;
+      left: 20px;
+      top: 20px;
+    }
+    .back-btn:hover {
+      background: #388e3c;
+    }
+
+    /* Notification bell icon */
+    .notification-bell {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: #ff6b6b;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .notification-bell:hover {
+      background: #ff5252;
+    }
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #ff0000;
+      color: white;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 15px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+      cursor: pointer;
+    }
+    .card:hover {
+      transform: scale(1.05);
+    }
+    .card img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .card h3 {
+      margin: 10px 0 0;
+      color: #1565c0;
+    }
+
+    /* Popup */
+    #sellPopup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      z-index: 1000;
+      width: 350px;
+    }
+    #sellPopup h3 {
+      color: #1565c0;
+    }
+    #sellPopup form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    #sellPopup input {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    #sellPopup button {
+      padding: 10px;
+      background: #1565c0;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    #overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 500;
+    }
+
+    /* ⭐ WHATSAPP STYLE NOTIFICATION POPUP */
+    .notification-popup {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: white;
+      border-left: 4px solid #43a047;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 2000;
+      max-width: 350px;
+      animation: slideIn 0.3s ease-out;
+      cursor: pointer;
+    }
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    .notification-popup p {
+      margin: 0;
+      color: #333;
+      font-weight: 500;
+    }
+    .notification-popup small {
+      color: #888;
+      display: block;
+      margin-top: 5px;
+    }
+
+    /* Notifications history modal */
+    #notificationsModal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      z-index: 1000;
+      width: 450px;
+      max-height: 600px;
+      overflow-y: auto;
+    }
+    #notificationsModal h2 {
+      margin-top: 0;
+      color: #1565c0;
+    }
+    .notification-item {
+      background: #f9f9f9;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      border-left: 4px solid #43a047;
+      transition: background 0.2s;
+    }
+    .notification-item:hover {
+      background: #f0f0f0;
+    }
+    .notification-item.unread {
+      background: #e8f5e9;
+      font-weight: 500;
+    }
+    .notification-item p {
+      margin: 5px 0;
+    }
+    .close-modal {
+      float: right;
+      cursor: pointer;
+      font-size: 24px;
+      color: #999;
+    }
+    .clear-all-btn {
+      background: #ff6b6b;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .clear-all-btn:hover {
+      background: #ff5252;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 🔙 Back Button -->
+  <button class="back-btn" onclick="window.location.href='dashboard.html'">⬅ Back</button>
+
+  <!-- ⭐ NOTIFICATION BELL -->
+  <button class="notification-bell" onclick="openNotificationsModal()">
+    🔔
+    <span class="notification-badge" id="notificationCount" style="display: none;">0</span>
+  </button>
+
+  <h1>Sell Your Crops</h1>
+
+  <!-- Cereals & Grains -->
+  <h2>🌾 Cereals & Grains</h2>
+
+  <div class="grid">
+    <div class="card" onclick="openSellForm('Wheat')"><img src="wheat.jpeg"><h3>Wheat</h3></div>
+    <div class="card" onclick="openSellForm('Rice')"><img src="rice.jpeg"><h3>Rice</h3></div>
+    <div class="card" onclick="openSellForm('Maize')"><img src="maize.jpg"><h3>Maize</h3></div>
+    <div class="card" onclick="openSellForm('Barley')"><img src="barley.jpeg"><h3>Barley</h3></div>
+    <div class="card" onclick="openSellForm('Pepper')"><img src="pepper.jpeg"><h3>Pepper</h3></div>
+    <div class="card" onclick="openSellForm('Groundnut')"><img src="groundnut.jpeg"><h3>Groundnut</h3></div>
+    <div class="card" onclick="openSellForm('Lentils')"><img src="lentils.jpeg"><h3>Lentils</h3></div>
+    <div class="card" onclick="openSellForm('Soybean')"><img src="soybean.jpeg"><h3>Soybean</h3></div>
+    <div class="card" onclick="openSellForm('Sesame')"><img src="sesame.jpg"><h3>Sesame</h3></div>
+    <div class="card" onclick="openSellForm('Peas')"><img src="peas.jpg"><h3>Peas</h3></div>
+    <div class="card" onclick="openSellForm('Gram Dal')"><img src="dal.jpg"><h3>Dal</h3></div>
+    <div class="card" onclick="openSellForm('ChickPeas')"><img src="chickpeas.jpeg"><h3>ChickPeas</h3></div>
+    <div class="card" onclick="openSellForm('Cotton')"><img src="cotton.jpg"><h3>Cotton</h3></div>
+    <div class="card" onclick="openSellForm('Arecanut')"><img src="arecanut.jpeg"><h3>Arecanut</h3></div>
+    <div class="card" onclick="openSellForm('Coconut')"><img src="coconut.jpeg"><h3>Coconut</h3></div>
+    <div class="card" onclick="openSellForm('Cardamom')"><img src="cardamom.jpeg"><h3>Cardamom</h3></div>
+    <div class="card" onclick="openSellForm('CashewNut')"><img src="cashewnut.jpeg"><h3>CashewNut</h3></div>
+    <div class="card" onclick="openSellForm('Almond')"><img src="almond.jpeg"><h3>Almond</h3></div>
+    <div class="card" onclick="openSellForm('Pista')"><img src="pista.jpeg"><h3>Pista</h3></div>
+    <div class="card" onclick="openSellForm('Cinnamon')"><img src="cinnamon.jpeg"><h3>Cinnamon</h3></div>
+    <div class="card" onclick="openSellForm('Cloves')"><img src="cloves.jpeg"><h3>Cloves</h3></div>
+    <div class="card" onclick="openSellForm('Fenugreek')"><img src="fenugreek.jpeg"><h3>Fenugreek</h3></div>
+    <div class="card" onclick="openSellForm('Coriander')"><img src="coriander.jpeg"><h3>Coriander</h3></div>
+    <div class="card" onclick="openSellForm('Sugarcane')"><img src="sugarcane.jpeg"><h3>Sugarcane</h3></div>
+    <div class="card" onclick="openSellForm('Mustard')"><img src="mustard.jpg"><h3>Mustard</h3></div>
+  </div>
+
+  <!-- Popup -->
+  <div id="overlay"></div>
+  <div id="sellPopup">
+    <h3 id="formTitle"></h3>
+    <form id="sellForm">
+      <input type="hidden" id="cropName" name="crop">
+      <input type="text" id="farmerName" name="name" placeholder="Your Name" required>
+      <input type="text" id="farmerLocation" name="location" placeholder="Your Location" required>
+      <input type="text" id="farmerContact" name="contact" placeholder="Contact Number" required>
+      <input type="number" id="farmerPrice" name="price" placeholder="Price per kg" required>
+      <button type="submit">Submit</button>
+      <button type="button" onclick="closeForm()">Cancel</button>
+    </form>
+  </div>
+
+  <!-- ⭐ NOTIFICATIONS MODAL -->
+  <div id="notificationOverlay" class="overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999;" onclick="closeNotificationsModal()"></div>
+  <div id="notificationsModal">
+    <span class="close-modal" onclick="closeNotificationsModal()">&times;</span>
+    <h2>📬 Buyer Registrations</h2>
+    <div id="notificationsList"></div>
+    <button class="clear-all-btn" onclick="clearAllNotifications()">Clear All</button>
+  </div>
+
+  <script>
+    // ⭐ Store farmer info from login
+    let farmerInfo = {
+      name: localStorage.getItem("farmerName") || "Unknown",
+      id: localStorage.getItem("farmerId") || "",
+      contact: localStorage.getItem("farmerContact") || ""
+    };
+
+    let notifications = [];
+    let lastCheckedTime = new Date();
+
+    function openSellForm(crop) {
+      document.getElementById("formTitle").innerText = "Sell " + crop;
+      document.getElementById("cropName").value = crop;
+      document.getElementById("overlay").style.display = "block";
+      document.getElementById("sellPopup").style.display = "block";
+    }
+
+    function closeForm() {
+      document.getElementById("overlay").style.display = "none";
+      document.getElementById("sellPopup").style.display = "none";
+    }
+
+    document.getElementById("sellForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const data = {
+        crop: document.getElementById("cropName").value,
+        name: document.getElementById("farmerName").value,
+        location: document.getElementById("farmerLocation").value,
+        contact: document.getElementById("farmerContact").value,
+        price: document.getElementById("farmerPrice").value
+      };
+
+      try {
+        const res = await fetch("http://localhost:3000/api/farmers", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+
+        if (res.ok) {
+          alert("✅ Your crop details were submitted successfully!");
+          closeForm();
+          document.getElementById("sellForm").reset();
+        } else {
+          alert("⚠️ Error submitting crop details.");
+        }
+      } catch (err) {
+        alert("🚫 Could not connect to server. Make sure backend is running.");
+      }
+    });
+
+    // ⭐ FETCH BUYER REGISTRATIONS FOR YOUR CROPS
+    async function fetchBuyerNotifications() {
+      try {
+        const res = await fetch("http://localhost:3000/api/buyers");
+        const allBuyers = await res.json();
+
+        // Filter only buyers for YOUR crops
+        const myBuyerRegistrations = allBuyers.filter(buyer => {
+          return buyer.farmerName === farmerInfo.name;
+        });
+
+        // Load stored notifications from localStorage
+        const stored = localStorage.getItem("buyerNotifications");
+        let storedNotifications = stored ? JSON.parse(stored) : [];
+
+        // Find new notifications
+        myBuyerRegistrations.forEach(buyer => {
+          const alreadyExists = storedNotifications.some(n => n._id === buyer._id);
+          
+          if (!alreadyExists) {
+            // ⭐ NEW NOTIFICATION - Show popup
+            const notification = {
+              _id: buyer._id,
+              buyerName: buyer.name,
+              buyerContact: buyer.contact,
+              buyerLocation: buyer.location,
+              crop: buyer.crop,
+              createdAt: buyer.createdAt,
+              isRead: false
+            };
+
+            storedNotifications.push(notification);
+            showNotificationPopup(notification);
+          }
+        });
+
+        // Save to localStorage
+        localStorage.setItem("buyerNotifications", JSON.stringify(storedNotifications));
+        notifications = storedNotifications;
+        updateNotificationBadge();
+
+      } catch (err) {
+        console.error("Error loading buyer notifications", err);
+      }
+    }
+
+    // ⭐ WHATSAPP STYLE NOTIFICATION POPUP
+    function showNotificationPopup(notification) {
+      const popup = document.createElement("div");
+      popup.className = "notification-popup";
+      popup.innerHTML = `
+        <p>🛍️ New Buyer Interest!</p>
+        <small><strong>${notification.buyerName}</strong> wants to buy your <strong>${notification.crop}</strong></small>
+      `;
+      popup.onclick = () => {
+        openNotificationsModal();
+        markAsRead(notification._id);
+        popup.remove();
+      };
+
+      document.body.appendChild(popup);
+
+      // Auto remove after 5 seconds
+      setTimeout(() => {
+        if (popup.parentNode) {
+          popup.remove();
+        }
+      }, 5000);
+    }
+
+    // ⭐ MARK NOTIFICATION AS READ
+    function markAsRead(notificationId) {
+      notifications = notifications.map(n => {
+        if (n._id === notificationId) {
+          n.isRead = true;
+        }
+        return n;
+      });
+      localStorage.setItem("buyerNotifications", JSON.stringify(notifications));
+      updateNotificationBadge();
+      displayNotifications();
+    }
+
+    // ⭐ UPDATE BADGE COUNT
+    function updateNotificationBadge() {
+      const unreadCount = notifications.filter(n => !n.isRead).length;
+      const badge = document.getElementById("notificationCount");
+      if (unreadCount > 0) {
+        badge.textContent = unreadCount;
+        badge.style.display = "flex";
+      } else {
+        badge.style.display = "none";
+      }
+    }
+
+    // ⭐ OPEN NOTIFICATIONS MODAL
+    function openNotificationsModal() {
+      document.getElementById("notificationOverlay").style.display = "block";
+      document.getElementById("notificationsModal").style.display = "block";
+      displayNotifications();
+    }
+
+    function closeNotificationsModal() {
+      document.getElementById("notificationOverlay").style.display = "none";
+      document.getElementById("notificationsModal").style.display = "none";
+    }
+
+    // ⭐ DISPLAY ALL NOTIFICATIONS
+    function displayNotifications() {
+      const container = document.getElementById("notificationsList");
+      container.innerHTML = "";
+
+      if (notifications.length === 0) {
+        container.innerHTML = "<p style='text-align: center; color: #999;'>No buyer registrations yet</p>";
+        return;
+      }
+
+      notifications.forEach(notif => {
+        const div = document.createElement("div");
+        div.className = `notification-item ${notif.isRead ? "" : "unread"}`;
+        div.innerHTML = `
+          <p><strong>🧑‍🌾 ${notif.buyerName}</strong></p>
+          <p>📱 Contact: ${notif.buyerContact}</p>
+          <p>📍 Location: ${notif.buyerLocation}</p>
+          <p>🌾 Interested in: <strong>${notif.crop}</strong></p>
+          <small>📅 ${new Date(notif.createdAt).toLocaleString()}</small>
+        `;
+        div.onclick = () => markAsRead(notif._id);
+        container.appendChild(div);
+      });
+    }
+
+    // ⭐ CLEAR ALL NOTIFICATIONS
+    function clearAllNotifications() {
+      notifications = [];
+      localStorage.removeItem("buyerNotifications");
+      displayNotifications();
+      updateNotificationBadge();
+      alert("✅ All notifications cleared!");
+    }
+
+    // ⭐ FETCH NOTIFICATIONS EVERY 5 SECONDS
+    setInterval(fetchBuyerNotifications, 5000);
+    fetchBuyerNotifications();
+  </script>
+
+</body>
+</html>

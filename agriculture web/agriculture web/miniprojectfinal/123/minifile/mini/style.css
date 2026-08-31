@@ -1,0 +1,60 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #f6f6f6;
+}
+.container {
+  max-width: 480px;
+  margin: 40px auto;
+  background: #fff;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 2px 24px rgba(0,0,0,0.08);
+  text-align: center;
+}
+.logo, .logo-small {
+  width: 120px;
+  margin-bottom: 24px;
+}
+.landing .role-select button {
+  width: 48%;
+  margin: 8px 1%;
+  padding: 16px;
+  font-size: 1.2em;
+  border-radius: 8px;
+  border: none;
+  background: #43a047;
+  color: #fff;
+  cursor: pointer;
+}
+.landing .role-select button:hover {
+  background: #388e3c;
+}
+.login input[type="text"], .login input[type="password"] {
+  width: 90%;
+  padding: 10px;
+  margin: 12px 0;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1em;
+}
+.login button {
+  width: 96%;
+  padding: 12px;
+  border-radius: 7px;
+  background: #43a047;
+  color: #fff;
+  border: none;
+  font-size: 1.1em;
+  margin: 8px 0;
+}
+.language-translator {
+  margin: 24px 0;
+}
+.language-translator select {
+  font-size: 1.1em;
+  padding: 7px;
+  border-radius: 7px;
+  border: 1px solid #43a047;
+  background: #e8f5e9;
+}

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Current Market Prices - Agriconnect</title>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: #f5fff5;
+      text-align: center;
+      padding: 30px;
+    }
+
+    h1 {
+      color: #2e7d32;
+      margin-bottom: 10px;
+    }
+
+    p {
+      color: #444;
+    }
+
+    /* 🔍 Search bar styling */
+    .search-container {
+      margin: 20px auto;
+      width: 60%;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .search-container input {
+      padding: 10px;
+      width: 70%;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+
+    .search-container button {
+      padding: 10px 18px;
+      background-color: #2e7d32;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+    }
+
+    .search-container button:hover {
+      background-color: #256428;
+    }
+
+    table {
+      margin: auto;
+      border-collapse: collapse;
+      width: 95%;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background: #2e7d32;
+      color: white;
+    }
+
+    tr:hover {
+      background: #e8f5e9;
+    }
+
+    .loader {
+      display: none;
+      font-size: 18px;
+      color: #555;
+      margin-top: 20px;
+    }
+
+    .error {
+      color: red;
+      margin-top: 15px;
+    }
+
+    .back-btn {
+      margin-top: 25px;
+      background-color: #2e7d32;
+      color: white;
+      padding: 10px 18px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+    }
+
+    .back-btn:hover {
+      background-color: #256428;
+    }
+  </style>
+</head>
+<body>
+  <h1>🌾 Current Market Prices</h1>
+  <p>Data fetched directly from the official government API</p>
+
+  <!-- 🔍 Search Section -->
+  <div class="search-container">
+    <input type="text" id="searchInput" placeholder="Search by crop, district, or state..." />
+    <button onclick="applySearch()">Search</button>
+  </div>
+
+  <div class="loader" id="loader">Loading latest crop prices...</div>
+  <div class="error" id="error"></div>
+
+  <table id="priceTable">
+    <thead>
+      <tr>
+        <th>Crop Name</th>
+        <th>Market</th>
+        <th>District</th>
+        <th>State</th>
+        <th>Min Price (₹)</th>
+        <th>Max Price (₹)</th>
+        <th>Modal Price (₹)</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <button class="back-btn" onclick="window.location.href='dashboard.html'">⬅ Back to Dashboard</button>
+
+  <script>
+    const apiKey = "579b464db66ec23bdd0000014346be2edb974a6045dc0a31ff5c3e81"; 
+    const apiUrl = `https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070?api-key=${apiKey}&format=json&limit=200`;
+
+    const loader = document.getElementById("loader");
+    const errorDiv = document.getElementById("error");
+    const tableBody = document.querySelector("#priceTable tbody");
+    let allData = []; // Store fetched data
+
+    // Fetch crop prices
+    async function fetchCropPrices() {
+      loader.style.display = "block";
+      errorDiv.innerText = "";
+      try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        loader.style.display = "none";
+
+        if (data.records && data.records.length > 0) {
+          allData = data.records;
+          displayData(allData);
+        } else {
+          errorDiv.innerText = "No data available from the API right now.";
+        }
+      } catch (err) {
+        loader.style.display = "none";
+        errorDiv.innerText = "Error fetching data. Please check your internet or API key.";
+        console.error(err);
+      }
+    }
+
+    // Display data in table
+    function displayData(records) {
+      tableBody.innerHTML = "";
+      if (records.length === 0) {
+        tableBody.innerHTML = "<tr><td colspan='7'>No results found for your search.</td></tr>";
+        return;
+      }
+
+      records.forEach(item => {
+        const row = `<tr>
+          <td>${item.commodity || "N/A"}</td>
+          <td>${item.market || "N/A"}</td>
+          <td>${item.district || "N/A"}</td>
+          <td>${item.state || "N/A"}</td>
+          <td>${item.min_price || "-"}</td>
+          <td>${item.max_price || "-"}</td>
+          <td>${item.modal_price || "-"}</td>
+        </tr>`;
+        tableBody.innerHTML += row;
+      });
+    }
+
+    // Filter data by search input
+    function applySearch() {
+      const query = document.getElementById("searchInput").value.toLowerCase().trim();
+      const filteredData = allData.filter(item =>
+        (item.commodity && item.commodity.toLowerCase().includes(query)) ||
+        (item.district && item.district.toLowerCase().includes(query)) ||
+        (item.state && item.state.toLowerCase().includes(query))
+      );
+      displayData(filteredData);
+    }
+
+    fetchCropPrices();
+  </script>
+</body>
+</html>

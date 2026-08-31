@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - Agriconnect</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 0;
+    }
+
+    .dashboard {
+      max-width: 900px;
+      margin: 50px auto;
+      background: #fff;
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 30px;
+      position: relative; /* Required for centering heading */
+    }
+
+    /* Center the heading */
+    header h2 {
+      margin: 0;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      color: #2e7d32;
+    }
+
+    .logo-small {
+      width: 60px;
+      height: auto;
+    }
+
+    select {
+      padding: 6px 10px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    main {
+      font-size: 18px;
+      color: #333;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      left: -9999px;
+    }
+
+    .btn-container {
+      margin-top: 30px;
+    }
+
+    .btn {
+      padding: 10px 18px;
+      margin-right: 10px;
+      background-color: #2e7d32;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #256428;
+    }
+  </style>
+</head>
+<body>
+  <div class="container dashboard">
+    <header>
+      <img src="logo.jpg" alt="Agriconnect Logo" class="logo-small" />
+      
+      <h2 data-translate="dashboardTitle">Agriconnect Dashboard</h2>
+
+      <!-- Language menu (kept as empty space for alignment) -->
+      <div style="width:60px;"></div>
+    </header>
+
+    <main>
+      <p data-translate="welcomeMsg">Welcome to your Dashboard!</p>
+      <p data-translate="instructions">Here you can access different services and information.</p>
+
+      <div class="btn-container">
+        <button class="btn" onclick="window.location.href='farmer.html'" data-translate="farmerPage">Go to Farmer Page</button>
+        <button class="btn" onclick="window.location.href='buyer.html'" data-translate="buyerPage">Go to Buyer Page</button>
+        <button class="btn" onclick="window.location.href='market.html'" data-translate="marketPrices">View Current Market Prices</button>
+      </div>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
